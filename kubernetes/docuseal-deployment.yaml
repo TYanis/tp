@@ -20,7 +20,10 @@ spec:
       containers:
         - env:
             - name: DATABASE_URL
-              value: postgresql://postgres:postgres@postgres:5432/docuseal
+              valueFrom:
+                secretKeyRef:
+                  name: docuseal-db-url
+                  key: DATABASE_URL
           image: docuseal/docuseal:latest
           name: app
           ports:
