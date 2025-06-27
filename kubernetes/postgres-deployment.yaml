@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    docuseal: postgres
+  name: postgres
+  namespace: docuseal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      docuseal: postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        docuseal: postgres
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_DB
+              value: docuseal
+            - name: POSTGRES_PASSWORD
+              value: postgres
+            - name: POSTGRES_USER
+              value: postgres
+          image: postgres:15
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready -U postgres
+            failureThreshold: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+          name: postgres
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-claim0
+      restartPolicy: Always
+      volumes:
+        - name: postgres-claim0
+          hostPath:
+            path: /srv/docuseal/pg_data
+            type: Directory

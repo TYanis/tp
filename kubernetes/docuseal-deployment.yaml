@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    docuseal: docuseal
+  name: docuseal
+  namespace: docuseal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      docuseal: docuseal
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        docuseal: docuseal
+    spec:
+      containers:
+        - env:
+            - name: DATABASE_URL
+              value: postgresql://postgres:postgres@postgres:5432/docuseal
+          image: docuseal/docuseal:latest
+          name: app
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /data/docuseal
+              name: app-claim0
+      restartPolicy: Always
+      volumes:
+        - name: app-claim0
+          hostPath:
+            path: /srv/docuseal/docuseal
+            type: Directory
